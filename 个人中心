@@ -1,0 +1,773 @@
+
+# 1. 接口概述
+
+## 2.1. 通信基础信息
+### 2.1.1. baseURL
+* baseURL:https://www.tacu.com/
+
+>入参格式：form-data
+
+> 出参格式 : json
+
+### 2.1.2. 前端密码加密规则
+
+```javascript
+const salt = 'dig?F*ckDang5PaSsWOrd&%(12lian0160630).'
+let pwd = md5(pwd + salt)
+```
+
+## 2.2. 注册登录
+
+### 2.2.1. 注册
+
+#### 2.2.1.3. user/sendEmailForRegisterV3：注册前发送短信（并检测手机号是否已经被注册）
+
+- Request Url: baseUrl +/user/sendEmailForRegisterV3
+- method: POST
+- parameter: 
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|email  | 手机号 | string|
+|phoneCode  |区号 | string|
+|sliderToken  |滑动验证码token |string|
+|local   |  语种 | string |
+
+- local 语种
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|zh_TW  | 繁体中文 | string|
+|en_US  | 英文 | string|
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。
+- response data：
+- status
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|200        |可以使用   |  int |
+|414        |郵箱已經被綁定   |  int |
+|421        |手機號已經被使用   |  int |
+|572      |滑動驗證失敗   |  int |
+
+- example
+
+``` javascript
+// 成功
+{
+	"attachment":null,
+	"message":null,
+	"status":200
+}
+
+// 郵箱已經被綁定 
+{
+	"attachment":null
+	"message":"郵箱已經被綁定",
+	"status":414
+}
+
+// 手機號已經被使用
+{
+	"attachment":null,
+	"message":"手機號已經被使用",
+	"status":421
+}
+
+// 滑動驗證失敗
+{
+	"attachment":null,
+	"message":"滑動驗證失敗",
+	"status":572
+}
+```
+
+#### 2.2.1.4. user/registerV3：注册（第二版，加入滑动验证）
+
+- 密码为明文传输
+- Request Url:baseUrl + /user/registerV3
+- method: POST
+- parameter: 
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|email  | 用户名 | string|
+|pwd    |密码     |string|
+|vercode    |验证码    |  string |
+|inviteId  |邀请码  |string|
+|fdPwd|支付密码|int|
+|local   |  语种 | string |
+|source   | 来源 1. web 2. app. 3. android 4. ios 5. api 6. H5H5| Integer |
+
+- local 语种
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|zh_TW  | 繁体中文 | string|
+|en_US  | 英文 | string|
+
+- response description ：注册成功跳转到登陆页，未成功出现以下情况。
+- response data：
+- status：
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|0        |參數為空   |  int |
+|200        |注册成功   |  int |
+|403        |驗證碼錯誤   |  int |
+|406        |用戶已存在   |  int |
+|408        |注册失敗   |  int |
+|443        |密碼格式有誤   |  int |
+|500        |非常抱歉，根據您的IP地址，我們暫不支持您所在的國家或地區在ChaoEx使用該服務   |  int |
+
+- example
+
+```javaScript
+// 正确
+{
+	"attachment":null,
+	"message":null,
+	"status":200
+}
+
+// 參數為空
+{
+	"attachment":null,
+	"message":"參數為空",
+	"status":0
+}
+
+// 驗證碼錯誤
+{
+	"attachment":null,
+	"message":"驗證碼錯誤",
+	"status":403
+}
+
+// 用戶已存在
+{
+	"attachment":null,
+	"message":"用戶已存在",
+	"status":406
+}
+
+// 注册失敗
+{
+	"attachment":null,
+	"message":"注册失敗",
+	"status":408
+}
+
+// 密碼格式有誤
+{
+	"attachment":null,
+	"message":"密碼格式有誤",
+	"status":443
+}
+
+// 非常抱歉，根據您的IP地址，我們暫不支持您所在的國家或地區在Tacu使用該服務
+{
+	"attachment":null,
+	"message":"非常抱歉，根據您的IP地址，我們暫不支持您所在的國家或地區在Tacu使用該服務",
+	"status":500
+}
+```
+
+## 2.3. 登录
+
+### 2.3.1. 登录
+
+#### 2.3.1.1. user/loginGAFirstV2：登录（第二版，加入滑动验证）
+
+- Request Url:baseUrl + /user/loginGAFirstV2
+- method: POST
+- parameter: 
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|email      |用户名    |  string |
+|pwd        |密码    |  string |
+|source    | 来源  | int|
+|sliderToken    | 滑动验证token|string|
+|local   |  语种 | string |
+
+- local 语种
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|zh_TW  | 繁体中文 | string|
+|en_US  | 英文 | string|
+
+- source 来源
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|1      |PC端，默认   |  int |
+|2      |移动端   |  int |
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。
+- response data：
+- status
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|0        |參數為空   |  int |
+|200      |登录成功   |  int |
+|405      |用戶名或密碼錯誤   |  int |
+|407      |用戶已禁用，請聯系管理員   |  int |
+|455      |您已连续多次输入错误密码， 请五分钟后重试   |  int |
+|572      |滑動驗證失敗   |  int |
+|5555     |请进行谷歌认证   |  int |
+|21001    |登入失敗   |  int |
+
+- example
+
+```javascript
+// 正确
+{
+	"attachment": {
+		"uid": 25467,
+		"token": "-pWtW2f3LoMLe0i6WvIeZMXd37jLVQIQ",
+		"point": null,
+		"uname": null,
+		"isShow": 0
+	},
+	"message": null,
+	"status": 200
+}
+
+// 參數為空
+{
+	"attachment":null,
+	"message":"參數為空",
+	"status":0
+}
+
+// 用戶名或密碼錯誤
+{
+	"attachment":null,
+	"message":"用戶名或密碼錯誤",
+	"status":405
+}
+
+// 用戶已禁用，請聯系管理員
+{
+	"attachment":null,
+	"message":"用戶已禁用，請聯系管理員",
+	"status":407
+}
+
+// 您已连续多次输入错误密码， 请五分钟后重试
+{
+	"attachment":null,
+	"message":"您已连续多次输入错误密码， 请五分钟后重试",
+	"status":455
+}
+
+// 滑動驗證失敗
+{
+	"attachment":null,
+	"message":"滑動驗證失敗",
+	"status":572
+}
+
+// 登入失敗
+{
+	"attachment":null,
+	"message":"登入失敗",
+	"status":21001
+}
+
+// 请进行谷歌认证
+{
+	"attachment":{
+		"uid":25354
+	},
+	"message":"请进行谷歌认证",
+	"status":5555
+}
+
+//密码+盐，然后md5摘要
+
+//salt=” dig?F*ckDang5PaSsWOrd&%(12lian0160630).”
+```
+
+#### 2.3.1.2. user/loginGASecond：谷歌验证登录
+
+- Request Url: baseUrl +/user/loginGASecond
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|email  |用户名  | string|
+|clientPassword| 客户密码 |string |
+|source | 来源  |int|
+|local   |  语种 ，繁体中文，可选zh_TW、en | string |
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。
+- example
+
+```
+{
+"attachment":{
+	"email": "15578087805",
+	"clientPassword": "11256",
+	"source": "1",
+	"local": "zh_TW"
+	"token ": "************************",
+	"uid ": "*****",
+	"point":null,
+	"uname":null,
+	"isShow":0
+},
+"message":null,
+"status":200
+}
+```
+
+#### 2.3.1.3. user/logout：退出登录
+
+- Request Url: baseUrl +/user/logout
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|token  |操作请求token 过期后需要重新获取| string|
+|uid |用户ID |number|
+|local   |  语种 ，繁体中文，可选zh_TW、en | string |
+
+- example
+
+```
+{
+	"attachment":{
+	"token ": "************************",
+	"uid ": "*****",
+	"local": "zh_TW"
+	},
+	"message":"退出成功",
+	"status":200
+}
+```
+
+### 2.3.2. 忘记密码
+
+
+#### 2.4.4.3. /user/sendMailV2 忘记密码前发送短信 验证码
+
+- Request Url: baseUrl +/user/sendMailV2
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|local | 语言  |string|
+|sliderToken | 滑动验证码  |string|
+|email | 手机  |string|
+|phoneCode | 区号  |string|
+
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。 
+
+
+
+#### 2.4.4.3. /user/bindPhoneSendMsgV3 发送手机/邮箱验证码(修改密码)
+
+- Request Url: baseUrl +/user/bindPhoneSendMsgV3
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|uid  | 用户id  | string|
+|token| token |string |
+|local | 语言  |string|
+|sliderToken | 滑动验证码  |string|
+|type | 1.新手机 2.新邮箱 3. 原手机  4. 原邮箱  |string|
+|phone | 手机/邮箱  |string|
+|phoneCode | 手机区号  |int|
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。 
+
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。
+- response data：
+- status
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|200        |发送成功   |  int |
+|512      |用戶不存在   |  int |
+|572      |滑動驗證失敗   |  int |
+
+- example
+
+```
+// 成功
+{
+	"attachment":null,
+	"message":null,
+	"status":200
+}
+
+// 用戶不存在
+{
+	"attachment":null,
+	"message":"用戶不存在",
+	"status":512
+}
+
+// 滑動驗證失敗
+{
+	"attachment":null,
+	"message":"滑動驗證失敗",
+	"status":572
+}
+```
+
+
+#### 2.4.4.4. /user/validCodeV3 重置密码前 验证已发送手机/邮箱的验证码
+
+- Request Url: baseUrl +/user/validCodeV3
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|uid  | 用户id  | string|
+|token| token |string |
+|local | 语言  |string|
+|vercode | 验证码  |string|
+|type | 3. 手机  4. 邮箱  |string|
+|phone | 手机/邮箱  |string|
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。
+
+
+#### 2.3.2.2. user/resetPwdV2：重置密码（第二版，加入滑动验证）
+
+- Request Url: baseUrl +/user/resetPwdV2
+- method: POST
+- parameter: 
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|email  |用户名  | string|
+|newPwd |新密码  |string|
+|vercode |验证码|string |
+|phoneCode |手机区号|int |
+|local   |  语种 | string |
+
+- local 语种
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|zh_TW  | 繁体中文 | string|
+|en_US  | 英文 | string|
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。
+- response data：
+- status
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|0        |參數為空   |  int |
+|402      | 驗證碼過期 |int |
+|403      | 驗證碼錯誤 |int |
+|409      | 用戶不存在 |int |
+|410      | 重置密碼失敗 |int |
+|443      |密碼格式有誤   |  int |
+|477      |交易密碼與登入密碼相同   |  int |
+|500      |郵箱未綁定   |  int |
+|500      |手機未綁定   |  int |
+
+- example
+
+```
+// 成功
+{
+	"attachment":null,
+	"message":null,
+	"status":200
+}
+
+// 參數為空
+{
+	"attachment":null,
+	"message":"參數為空",
+	"status":0
+}
+
+// 驗證碼過期
+{
+	"attachment":null,
+	"message":"驗證碼過期",
+	"status":402
+}
+
+// 验证码错误
+{
+	"attachment":null,
+	"message":"驗證碼錯誤",
+	"status":403
+}
+
+// 用戶不存在
+{
+	"attachment": null,
+	"message": 用戶不存在,
+	"status": 409
+}
+
+// 重置密碼失敗
+{
+	"attachment": null,
+	"message": 重置密碼失敗,
+	"status": 410
+}
+
+// 密碼格式有誤
+{
+	"attachment":null,
+	"message":"密碼格式有誤",
+	"status":443
+}
+
+// 交易密碼與登入密碼相同
+{
+	"attachment":null,
+	"message":"交易密碼與登入密碼相同",
+	"status":477
+}
+
+// 郵箱未綁定
+{
+	"attachment":null,
+	"message":"郵箱未綁定",
+	"status":500
+}
+
+// 手機未綁定
+{
+	"attachment":null,
+	"message":"手機未綁定",
+	"status":500
+}
+```
+
+#### 2.4.4.1. /user/bindGoogleSendMsgV3 谷歌验证发送验证码
+
+- Request Url: baseUrl +/user/bindGoogleSendMsgV3
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|uid  | 用户id  | string|
+|token| 用户密码 |string |
+|local | 语言  |string|
+|sliderToken | 滑动验证码  |string|
+|type | 3. 手机  4. 邮箱  |string|
+
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。
+
+
+#### 2.4.4.2. /user/bindGoogleAuthV3 谷歌验证开启
+
+- Request Url: baseUrl +/user/bindGoogleAuthV3
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|uid  | 用户id  | string|
+|token| token |string |
+|local | 语言  |string|
+|sliderToken | 滑动验证码  |string|
+|type | 3. 手机  4. 邮箱  |string|
+|loginPassword | 登录密码  |string|
+|clientPassword | 谷歌验证码  |string|
+|vercode | 手机/邮箱验证码  |string|
+
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。
+
+#### 2.4.4.2. /user/closeGoogleAuthV3 谷歌验证关闭
+
+- Request Url: baseUrl +/user/closeGoogleAuthV3
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|uid  | 用户id  | string|
+|token| token |string |
+|local | 语言  |string|
+|sliderToken | 滑动验证码  |string|
+|type | 3. 手机  4. 邮箱  |string|
+|loginPassword | 登录密码  |string|
+|clientPassword | 谷歌验证码  |string|
+|vercode | 手机/邮箱验证码  |string|
+
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。
+
+
+#### 2.4.4.7. /user/bindFdPwdV3 设置/修改交易密码
+
+- Request Url: baseUrl +/user/bindFdPwdV3
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|uid  | 用户id  | string|
+|token| token |string |
+|local | 语言  |string|
+|newFdPassWord | 新密码  |string|
+|oldFdPassWord | 老密码  |string|
+|loginPassWord | 登录密码 |string|
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。 
+
+
+#### 2.4.4.7. user/updateFdPwdEnabled：更新开启交易密码的状态
+
+- Request Url:baseUrl +/user/updateFdPwdEnabled
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|fdPwd| 交易密码 |string |
+|enabled  | 打开关闭标志 |int |
+|token  |操作请求token 过期后需要重新获取 | string|
+|uid |用户ID |number|
+|local   |  语种 | string |
+ 
+- enabled 打开关闭标志
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|1  | 打开 | int|
+|2  | 关闭 | int|
+
+- local 语种
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|zh_TW  | 繁体中文 | string|
+|en_US  | 英文 | string|
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参 数不为200，则出现异常。
+- status
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|200| 設定成功 |int |
+|468| 交易密碼錯誤 |int |
+
+- example
+
+```
+// 正确
+{
+ "attachment": null,
+ "message": "設定成功",
+ "status": 200
+}
+
+// 错误
+{
+ "attachment": null,
+ "message": "交易密碼錯誤",
+ "status": 468
+}
+```
+
+
+#### 2.4.4.3. /user/bindPhoneSendMsgV3 发送手机/邮箱验证码
+
+- Request Url: baseUrl +/user/bindPhoneSendMsgV3
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|uid  | 用户id  | string|
+|token| token |string |
+|local | 语言  |string|
+|sliderToken | 滑动验证码  |string|
+|type | 3. 原手机  4. 原邮箱  |string|
+|phone | 手机/邮箱  |string|
+|phoneCode | 区号  |string|
+
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。 
+
+
+
+#### 2.4.4.4. /user/validCodeV3 验证已发送手机/邮箱的验证码
+
+- Request Url: baseUrl +/user/validCodeV3
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|uid  | 用户id  | string|
+|token| token |string |
+|local | 语言  |string|
+|vercode | 验证码  |string|
+|type | 3. 手机  4. 邮箱  |string|
+|phone | 手机/邮箱  |string|
+|phoneCode | 手机区号 |string|
+
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。
+
+
+
+#### 2.4.4.5. /user/bindPhoneV3 修改/绑定 手机/邮箱
+
+- Request Url: baseUrl +/user/bindPhoneV3
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|uid  | 用户id  | string|
+|token| token |string |
+|local | 语言  |string|
+|vercode | 验证码  |string|
+|type | 3. 手机  4. 邮箱  |string|
+|newPhone | 手机/邮箱  |string|
+|phoneCode | 手机区号 |string|
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。
+
+
+
+
+
+#### 2.5.1.8. user/isUsedGoogleAuth：查询用户是否绑定google验证
+
+- Request Url:baseUrl +/user/isUsedGoogleAuth
+- method: POST
+- parameter:
+
+|Item      |description  |type   |
+| -------- | :-----:|  :-------:  |
+|uid |用户ID |number|
+|local   |  语种 | string |
+
+
+- response description ：当接口返回的status为200时，则attachment包含以下数据，如果status参数不为200，则出现异常。
+isUsed=1已绑定 isUsed=0未绑定
+```
+{attachment: {isUsed: 1}, message: null, status: 200}
+```
